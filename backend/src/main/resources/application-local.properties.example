@@ -2,3 +2,7 @@
 spring.datasource.url=jdbc:postgresql://localhost:5432/jobtracker
 spring.datasource.username=your_username
 spring.datasource.password=your_password
+
+# JWT auth
+jwt.secret=your-secret-key
+jwt.expiration=86400000

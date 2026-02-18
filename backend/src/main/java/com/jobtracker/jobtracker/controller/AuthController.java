@@ -1,5 +1,7 @@
 package com.jobtracker.jobtracker.controller;
 
+import com.jobtracker.jobtracker.dto.AuthResponse;
+import com.jobtracker.jobtracker.dto.LoginRequest;
 import com.jobtracker.jobtracker.dto.RegisterRequest;
 import com.jobtracker.jobtracker.dto.UserResponse;
 import com.jobtracker.jobtracker.service.UserService;
@@ -26,4 +28,11 @@ public class AuthController {
         UserResponse response = userService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        AuthResponse response = userService.loginUser(request);
+        return ResponseEntity.ok(response);
+    }
+    
 }
