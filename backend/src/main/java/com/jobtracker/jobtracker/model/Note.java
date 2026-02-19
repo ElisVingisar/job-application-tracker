@@ -26,6 +26,7 @@ public class Note {
     @JoinColumn(name = "application_id", nullable = false)
     private Application application;
 
+    @Column(nullable = false)
     private String content;
 
     @CreationTimestamp
