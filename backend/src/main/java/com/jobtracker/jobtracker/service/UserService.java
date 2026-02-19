@@ -4,6 +4,8 @@ import com.jobtracker.jobtracker.model.User;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.jobtracker.jobtracker.dto.AuthResponse;
 import com.jobtracker.jobtracker.dto.LoginRequest;
 import com.jobtracker.jobtracker.dto.RegisterRequest;
@@ -27,12 +29,14 @@ public class UserService {
 
     // -- Public API ----------------------------------------------------
 
+    @Transactional
     public UserResponse registerUser(RegisterRequest request) {
         validateEmailNotTaken(request.getEmail());
         User savedUser = userRepository.save(createUserFromRequest(request));
         return mapToResponse(savedUser);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse loginUser(LoginRequest request) {
         User user = findUserByEmail(request.getEmail());
         validatePassword(request.getPassword(), user.getPassword());
