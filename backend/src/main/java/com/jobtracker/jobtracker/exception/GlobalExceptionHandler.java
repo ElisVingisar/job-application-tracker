@@ -36,4 +36,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "Request body is missing or malformed"));
     }
+
+    @ExceptionHandler(ApplicationNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleApplicationNotFound(ApplicationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
+    }
 }
