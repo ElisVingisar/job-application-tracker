@@ -9,12 +9,14 @@ interface AuthContextType {
   login: (authData: AuthResponse) => void
   logout: () => void
   isAuthenticated: boolean
+  isLoading: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   const logout = useCallback(() => {
     setUser(null)
@@ -44,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout()
       }
     }
+    
+    setIsLoading(false)
   }, [logout])
 
   // Intercept 401 responses and auto-logout
@@ -71,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, isLoading }}>
       {children}
     </AuthContext.Provider>
   )
