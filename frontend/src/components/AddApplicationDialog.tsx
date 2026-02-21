@@ -1,0 +1,256 @@
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { applicationsApi } from '@/api/applications'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import type { ApplicationRequest, WorkMode, ApplicationStatus } from '@/types/application'
+
+const applicationSchema = z.object({
+    companyName: z.string().min(1, 'Company name is required'),
+    positionTitle: z.string().min(1, 'Position title is required'),
+    location: z.string().optional(),
+    workMode: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).optional(),
+    applicationSource: z.string().optional(),
+    jobPostingUrl: z.union([z.literal(''), z.string().url('Must be a valid URL')]).optional(),
+    salaryMin: z.number().min(0).optional(),
+    salaryMax: z.number().min(0).optional(),
+    status: z.enum(['APPLIED', 'INTERVIEWING', 'OFFER', 'ACCEPTED', 'REJECTED', 'WITHDRAWN']),
+    applicationDate: z.string().min(1, 'Application date is required'),
+    nextStepDate: z.string().optional(),
+  }) satisfies z.ZodType<ApplicationRequest>
+
+interface AddApplicationDialogProps {
+  children: React.ReactNode
+}
+
+export default function AddApplicationDialog({ children }: AddApplicationDialogProps) {
+  const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
+
+  const form = useForm<ApplicationRequest>({
+    resolver: zodResolver(applicationSchema),
+    defaultValues: {
+      companyName: '',
+      positionTitle: '',
+      status: 'APPLIED',
+      applicationDate: new Date().toISOString().split('T')[0],
+    },
+  })
+
+  const mutation = useMutation({
+    mutationFn: applicationsApi.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+      setOpen(false)
+      form.reset({
+        companyName: '',
+        positionTitle: '',
+        status: 'APPLIED',
+        applicationDate: new Date().toISOString().split('T')[0],
+      })
+    },
+  })
+
+  const onSubmit = (data: ApplicationRequest) => {
+    const payload = {
+      ...data,
+      salaryMin: data.salaryMin || undefined,
+      salaryMax: data.salaryMax || undefined,
+    }
+    mutation.mutate(payload)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Add Application</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Company Name */}
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Company Name *</Label>
+              <Input
+                id="companyName"
+                {...form.register('companyName')}
+                placeholder="e.g., Google"
+              />
+              {form.formState.errors.companyName && (
+                <p className="text-sm text-red-500">{form.formState.errors.companyName.message}</p>
+              )}
+            </div>
+
+            {/* Position Title */}
+            <div className="space-y-2">
+              <Label htmlFor="positionTitle">Position Title *</Label>
+              <Input
+                id="positionTitle"
+                {...form.register('positionTitle')}
+                placeholder="e.g., Software Engineer"
+              />
+              {form.formState.errors.positionTitle && (
+                <p className="text-sm text-red-500">{form.formState.errors.positionTitle.message}</p>
+              )}
+            </div>
+
+            {/* Location */}
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                {...form.register('location')}
+                placeholder="e.g., San Francisco, CA"
+              />
+            </div>
+
+            {/* Work Mode */}
+            <div className="space-y-2">
+              <Label htmlFor="workMode">Work Mode</Label>
+              <Select onValueChange={(value) => form.setValue('workMode', value as WorkMode)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select work mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="REMOTE">Remote</SelectItem>
+                  <SelectItem value="HYBRID">Hybrid</SelectItem>
+                  <SelectItem value="ONSITE">Onsite</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Application Source */}
+            <div className="space-y-2">
+              <Label htmlFor="applicationSource">Application Source</Label>
+              <Input
+                id="applicationSource"
+                {...form.register('applicationSource')}
+                placeholder="e.g., LinkedIn"
+              />
+            </div>
+
+            {/* Job Posting URL */}
+            <div className="space-y-2">
+              <Label htmlFor="jobPostingUrl">Job Posting URL</Label>
+              <Input
+                id="jobPostingUrl"
+                {...form.register('jobPostingUrl')}
+                placeholder="https://..."
+              />
+              {form.formState.errors.jobPostingUrl && (
+                <p className="text-sm text-red-500">{form.formState.errors.jobPostingUrl.message}</p>
+              )}
+            </div>
+
+            {/* Salary Min */}
+            <div className="space-y-2">
+              <Label htmlFor="salaryMin">Minimum Salary</Label>
+              <Input
+                id="salaryMin"
+                type="number"
+                {...form.register('salaryMin', { valueAsNumber: true })}
+                placeholder="e.g., 100000"
+              />
+            </div>
+
+            {/* Salary Max */}
+            <div className="space-y-2">
+              <Label htmlFor="salaryMax">Maximum Salary</Label>
+              <Input
+                id="salaryMax"
+                type="number"
+                {...form.register('salaryMax', { valueAsNumber: true })}
+                placeholder="e.g., 150000"
+              />
+            </div>
+
+            {/* Status */}
+            <div className="space-y-2">
+              <Label htmlFor="status">Status *</Label>
+              <Select 
+                defaultValue="APPLIED"
+                onValueChange={(value) => form.setValue('status', value as ApplicationStatus)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="APPLIED">Applied</SelectItem>
+                  <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
+                  <SelectItem value="OFFER">Offer</SelectItem>
+                  <SelectItem value="ACCEPTED">Accepted</SelectItem>
+                  <SelectItem value="REJECTED">Rejected</SelectItem>
+                  <SelectItem value="WITHDRAWN">Withdrawn</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Application Date */}
+            <div className="space-y-2">
+              <Label htmlFor="applicationDate">Application Date *</Label>
+              <Input
+                id="applicationDate"
+                type="date"
+                {...form.register('applicationDate')}
+              />
+              {form.formState.errors.applicationDate && (
+                <p className="text-sm text-red-500">{form.formState.errors.applicationDate.message}</p>
+              )}
+            </div>
+
+            {/* Next Step Date */}
+            <div className="space-y-2 md:col-span-2">
+              <Label htmlFor="nextStepDate">Next Step Date</Label>
+              <Input
+                id="nextStepDate"
+                type="date"
+                {...form.register('nextStepDate')}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={mutation.isPending}>
+              {mutation.isPending ? 'Adding...' : 'Add Application'}
+            </Button>
+          </div>
+
+          {mutation.isError && (
+            <p className="text-sm text-red-500">
+              Failed to add application. Please try again.
+            </p>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
