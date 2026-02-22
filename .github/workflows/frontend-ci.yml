@@ -38,8 +38,8 @@ jobs:
       working-directory: ./frontend
       run: npm run build
 
-    # Cypress tests require backend to be running
-    # Commented out for now - can be enabled once backend is deployed
-    # - name: Run Cypress tests
-    #   working-directory: ./frontend
-    #   run: npm run test:e2e
+    - name: Run Cypress tests
+      working-directory: ./frontend
+      env:
+        VITE_API_TARGET: https://job-application-tracker-production-365b.up.railway.app
+      run: npm run test:e2e
