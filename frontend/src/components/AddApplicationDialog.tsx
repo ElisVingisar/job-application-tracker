@@ -23,19 +23,27 @@ import {
 } from '@/components/ui/select'
 import type { ApplicationRequest, WorkMode, ApplicationStatus } from '@/types/application'
 
-const applicationSchema = z.object({
+const formSchema = z.object({
     companyName: z.string().min(1, 'Company name is required'),
     positionTitle: z.string().min(1, 'Position title is required'),
     location: z.string().optional(),
-    workMode: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).optional(),
+    workMode: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).nullable().optional(),
     applicationSource: z.string().optional(),
     jobPostingUrl: z.union([z.literal(''), z.string().url('Must be a valid URL')]).optional(),
-    salaryMin: z.number().min(0).optional(),
-    salaryMax: z.number().min(0).optional(),
+    salaryMin: z.string()
+      .optional()
+      .refine((val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+        message: 'Must be a positive number'
+      }),
+    salaryMax: z.string()
+      .optional()
+      .refine((val) => !val || val === '' || (!isNaN(Number(val)) && Number(val) >= 0), {
+        message: 'Must be a positive number'
+      }),
     status: z.enum(['APPLIED', 'INTERVIEWING', 'OFFER', 'ACCEPTED', 'REJECTED', 'WITHDRAWN']),
     applicationDate: z.string().min(1, 'Application date is required'),
     nextStepDate: z.string().optional(),
-  }) satisfies z.ZodType<ApplicationRequest>
+  })
 
 interface AddApplicationDialogProps {
   children: React.ReactNode
@@ -45,13 +53,20 @@ export default function AddApplicationDialog({ children }: AddApplicationDialogP
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<ApplicationRequest>({
-    resolver: zodResolver(applicationSchema),
+  const form = useForm({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       companyName: '',
       positionTitle: '',
-      status: 'APPLIED',
+      location: '',
+      workMode: undefined,
+      applicationSource: '',
+      jobPostingUrl: '',
+      salaryMin: '',
+      salaryMax: '',
+      status: 'APPLIED' as ApplicationStatus,
       applicationDate: new Date().toISOString().split('T')[0],
+      nextStepDate: '',
     },
   })
 
@@ -63,17 +78,35 @@ export default function AddApplicationDialog({ children }: AddApplicationDialogP
       form.reset({
         companyName: '',
         positionTitle: '',
-        status: 'APPLIED',
+        location: '',
+        workMode: undefined,
+        applicationSource: '',
+        jobPostingUrl: '',
+        salaryMin: '',
+        salaryMax: '',
+        status: 'APPLIED' as ApplicationStatus,
         applicationDate: new Date().toISOString().split('T')[0],
+        nextStepDate: '',
       })
     },
   })
 
-  const onSubmit = (data: ApplicationRequest) => {
-    const payload = {
-      ...data,
-      salaryMin: data.salaryMin || undefined,
-      salaryMax: data.salaryMax || undefined,
+  const onSubmit = (data: any) => {
+    const salaryMin = data.salaryMin?.trim()
+    const salaryMax = data.salaryMax?.trim()
+
+    const payload: ApplicationRequest = {
+      companyName: data.companyName,
+      positionTitle: data.positionTitle,
+      location: data.location || undefined,
+      workMode: data.workMode || undefined,
+      applicationSource: data.applicationSource || undefined,
+      jobPostingUrl: data.jobPostingUrl || undefined,
+      salaryMin: salaryMin !== '' && salaryMin !== undefined ? Number(salaryMin) : undefined,
+      salaryMax: salaryMax !== '' && salaryMax !== undefined ? Number(salaryMax) : undefined,
+      status: data.status,
+      applicationDate: data.applicationDate,
+      nextStepDate: data.nextStepDate || undefined,
     }
     mutation.mutate(payload)
   }
@@ -128,7 +161,10 @@ export default function AddApplicationDialog({ children }: AddApplicationDialogP
             {/* Work Mode */}
             <div className="space-y-2">
               <Label htmlFor="workMode">Work Mode</Label>
-              <Select onValueChange={(value) => form.setValue('workMode', value as WorkMode)}>
+              <Select
+                value={form.watch('workMode') ?? ''}
+                onValueChange={(value) => form.setValue('workMode', value as WorkMode)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select work mode" />
                 </SelectTrigger>
@@ -168,10 +204,14 @@ export default function AddApplicationDialog({ children }: AddApplicationDialogP
               <Label htmlFor="salaryMin">Minimum Salary</Label>
               <Input
                 id="salaryMin"
-                type="number"
-                {...form.register('salaryMin', { valueAsNumber: true })}
-                placeholder="e.g., 100000"
+                type="text"
+                inputMode="numeric"
+                {...form.register('salaryMin')}
+                placeholder="e.g., 1000"
               />
+              {form.formState.errors.salaryMin && (
+                <p className="text-sm text-red-500">{form.formState.errors.salaryMin.message}</p>
+              )}
             </div>
 
             {/* Salary Max */}
@@ -179,10 +219,14 @@ export default function AddApplicationDialog({ children }: AddApplicationDialogP
               <Label htmlFor="salaryMax">Maximum Salary</Label>
               <Input
                 id="salaryMax"
-                type="number"
-                {...form.register('salaryMax', { valueAsNumber: true })}
-                placeholder="e.g., 150000"
+                type="text"
+                inputMode="numeric"
+                {...form.register('salaryMax')}
+                placeholder="e.g., 1500"
               />
+              {form.formState.errors.salaryMax && (
+                <p className="text-sm text-red-500">{form.formState.errors.salaryMax.message}</p>
+              )}
             </div>
 
             {/* Status */}
