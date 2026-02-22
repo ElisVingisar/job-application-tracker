@@ -1,9 +1,20 @@
 {
-  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["cypress"]
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["cypress", "node"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": [
-    "cypress/**/*.ts"
+    "cypress/**/*.ts",
+    "cypress/**/*.tsx",
+    "cypress.config.ts",
+    "src/**/*.ts"  // Allow src imports in tests
   ]
 }

@@ -7,7 +7,7 @@ export default defineConfig({
     specPattern: 'cypress/e2e/**/*.cy.ts',
     video: false,
     screenshotOnRunFailure: true,
-    setupNodeEvents(on, config) {
+    setupNodeEvents() {
       // implement node event listeners here if needed
     },
   },

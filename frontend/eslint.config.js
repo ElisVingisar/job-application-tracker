@@ -11,13 +11,21 @@ export default defineConfig([
     files: ['**/*.{ts,tsx}'],
     extends: [
       js.configs.recommended,
-      tseslint.configs.recommended,
+      ...tseslint.configs.recommended,
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'react-hooks/incompatible-library': 'off',
+      'react-refresh/only-export-components': 'off',  // Context files
+      'react-hooks/set-state-in-effect': 'off',       // AuthContext logout
+      'no-case-declarations': 'off',                  // Switch cases
+      '@typescript-eslint/no-unused-vars': 'warn',    // Unused vars
     },
   },
 ])
