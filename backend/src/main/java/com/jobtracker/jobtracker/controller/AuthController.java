@@ -3,7 +3,6 @@ package com.jobtracker.jobtracker.controller;
 import com.jobtracker.jobtracker.dto.AuthResponse;
 import com.jobtracker.jobtracker.dto.LoginRequest;
 import com.jobtracker.jobtracker.dto.RegisterRequest;
-import com.jobtracker.jobtracker.dto.UserResponse;
 import com.jobtracker.jobtracker.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
-        UserResponse response = userService.registerUser(request);
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        AuthResponse response = userService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

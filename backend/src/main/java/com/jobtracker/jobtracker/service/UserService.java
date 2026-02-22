@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jobtracker.jobtracker.dto.AuthResponse;
 import com.jobtracker.jobtracker.dto.LoginRequest;
 import com.jobtracker.jobtracker.dto.RegisterRequest;
-import com.jobtracker.jobtracker.dto.UserResponse;
 import com.jobtracker.jobtracker.exception.EmailAlreadyExistsException;
 import com.jobtracker.jobtracker.exception.InvalidCredentialsException;
 import com.jobtracker.jobtracker.repository.UserRepository;
@@ -30,10 +29,11 @@ public class UserService {
     // -- Public API ----------------------------------------------------
 
     @Transactional
-    public UserResponse registerUser(RegisterRequest request) {
+    public AuthResponse registerUser(RegisterRequest request) {
         validateEmailNotTaken(request.getEmail());
         User savedUser = userRepository.save(createUserFromRequest(request));
-        return mapToResponse(savedUser);
+        String token = jwtService.generateToken(savedUser.getEmail());
+        return new AuthResponse(token, savedUser.getEmail(), savedUser.getFullName());
     }
 
     @Transactional(readOnly = true)
@@ -71,14 +71,5 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName());
         return user;
-    }
-
-    private UserResponse mapToResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setEmail(user.getEmail());
-        response.setFullName(user.getFullName());
-        response.setCreatedAt(user.getCreatedAt());
-        return response;
     }
 }

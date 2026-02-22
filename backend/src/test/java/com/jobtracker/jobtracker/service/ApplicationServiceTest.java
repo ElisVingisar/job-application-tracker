@@ -3,7 +3,6 @@ package com.jobtracker.jobtracker.service;
 import com.jobtracker.jobtracker.dto.AuthResponse;
 import com.jobtracker.jobtracker.dto.LoginRequest;
 import com.jobtracker.jobtracker.dto.RegisterRequest;
-import com.jobtracker.jobtracker.dto.UserResponse;
 import com.jobtracker.jobtracker.exception.EmailAlreadyExistsException;
 import com.jobtracker.jobtracker.exception.InvalidCredentialsException;
 import com.jobtracker.jobtracker.model.User;
@@ -55,15 +54,18 @@ class ApplicationServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(jwtService.generateToken(anyString())).thenReturn("jwt-token");
 
         // When
-        UserResponse response = userService.registerUser(request);
+        AuthResponse response = userService.registerUser(request);
 
         // Then
+        assertThat(response.getToken()).isEqualTo("jwt-token");
         assertThat(response.getEmail()).isEqualTo("newuser@example.com");
         assertThat(response.getFullName()).isEqualTo("New User");
         verify(passwordEncoder).encode("password123");
         verify(userRepository).save(any(User.class));
+        verify(jwtService).generateToken("newuser@example.com");
     }
 
     @Test
