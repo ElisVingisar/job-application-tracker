@@ -19,5 +19,9 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',  // Error → warning
+      'react-hooks/incompatible-library': 'off'     // Skip React Hook Form watch
+    },
   },
 ])
