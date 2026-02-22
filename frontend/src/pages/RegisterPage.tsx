@@ -59,7 +59,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
@@ -76,7 +76,7 @@ export default function RegisterPage() {
                 {...register('fullName')}
               />
               {errors.fullName && (
-                <p className="text-sm text-red-600">{errors.fullName.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errors.fullName.message}</p>
               )}
             </div>
 
@@ -89,7 +89,7 @@ export default function RegisterPage() {
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-sm text-red-600">{errors.email.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
               )}
             </div>
 
@@ -102,7 +102,7 @@ export default function RegisterPage() {
                 {...register('password')}
               />
               {errors.password && (
-                <p className="text-sm text-red-600">{errors.password.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
               )}
             </div>
 
@@ -115,13 +115,13 @@ export default function RegisterPage() {
                 {...register('confirmPassword')}
               />
               {errors.confirmPassword && (
-                <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{errors.confirmPassword.message}</p>
               )}
             </div>
 
             {error && (
-              <div className="rounded-md bg-red-50 p-3">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
           </CardContent>
@@ -130,9 +130,9 @@ export default function RegisterPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               Already have an account?{' '}
-              <Link to="/login" className="text-zinc-900 underline hover:text-zinc-700">
+              <Link to="/login" className="text-zinc-900 dark:text-zinc-100 underline hover:text-zinc-700 dark:hover:text-zinc-300">
                 Sign in
               </Link>
             </p>
