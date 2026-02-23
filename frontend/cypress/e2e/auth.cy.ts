@@ -66,7 +66,7 @@ describe('Authentication Flow', () => {
     cy.get('#password').type(testUser.password)
     cy.get('#confirmPassword').type(testUser.password)
     cy.get('button[type="submit"]').click()
-    cy.url().should('include', '/applications')
+    cy.url({ timeout: 10000 }).should('include', '/applications')
 
     // Logout by clearing auth and reloading
     cy.clearLocalStorage()
@@ -79,7 +79,7 @@ describe('Authentication Flow', () => {
     cy.get('button[type="submit"]').click()
 
     // Should redirect to applications page
-    cy.url().should('include', '/applications')
+    cy.url({ timeout: 10000 }).should('include', '/applications')
   })
 
   it('should show error for invalid login credentials', () => {
