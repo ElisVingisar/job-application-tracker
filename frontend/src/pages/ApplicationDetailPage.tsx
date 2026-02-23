@@ -96,22 +96,22 @@ export default function ApplicationDetailPage() {
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Top Navigation */}
       <nav className="border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate('/applications')}
-              className="text-zinc-600 dark:text-zinc-400"
+              className="text-zinc-600 dark:text-zinc-400 shrink-0"
             >
-              <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-4 w-4 sm:mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back
+              <span className="hidden sm:inline">Back</span>
             </Button>
-            <h1 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">Application Details</h1>
+            <h1 className="text-lg font-medium text-zinc-900 dark:text-zinc-100 truncate">Application Details</h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
@@ -128,7 +128,7 @@ export default function ApplicationDetailPage() {
                 </svg>
               )}
             </Button>
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">{user?.fullName}</span>
+            <span className="hidden sm:inline text-sm text-zinc-500 dark:text-zinc-400">{user?.fullName}</span>
             <Button variant="ghost" size="sm" onClick={logout}>
               Sign out
             </Button>
@@ -136,7 +136,7 @@ export default function ApplicationDetailPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Header Section */}
         <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6 mb-6">
           <div className="flex items-start justify-between mb-4">
@@ -151,7 +151,7 @@ export default function ApplicationDetailPage() {
             </span>
           </div>
 
-          <div className="flex gap-8 text-sm">
+          <div className="flex flex-wrap gap-4 sm:gap-8 text-sm">
             {application.location && (
               <div className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,16 +178,18 @@ export default function ApplicationDetailPage() {
           <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
             <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-4">Application Information</h3>
             <div className="space-y-3">
-              <div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Application Date</div>
-                <div className="text-sm text-zinc-900 dark:text-zinc-100">{formatDate(application.applicationDate)}</div>
-              </div>
-              {application.nextStepDate && (
+              <div className="flex flex-col sm:flex-row sm:gap-8">
                 <div>
-                  <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Next Step Date</div>
-                  <div className="text-sm text-zinc-900 dark:text-zinc-100">{formatDate(application.nextStepDate)}</div>
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Application Date</div>
+                  <div className="text-sm text-zinc-900 dark:text-zinc-100">{formatDate(application.applicationDate)}</div>
                 </div>
-              )}
+                {application.nextStepDate && (
+                  <div className="mt-3 sm:mt-0">
+                    <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Next Step Date</div>
+                    <div className="text-sm text-zinc-900 dark:text-zinc-100">{formatDate(application.nextStepDate)}</div>
+                  </div>
+                )}
+              </div>
               {application.applicationSource && (
                 <div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Application Source</div>
@@ -215,7 +217,7 @@ export default function ApplicationDetailPage() {
            (application.salaryMax !== undefined && application.salaryMax !== null) ? (
             <div className="bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 p-6">
               <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-4">Salary Range</h3>
-              <div className="space-y-3">
+              <div className="flex gap-8">
                 {(application.salaryMin !== undefined && application.salaryMin !== null) && (
                   <div>
                     <div className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">Minimum</div>
@@ -234,9 +236,9 @@ export default function ApplicationDetailPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-3">
+        <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
           <EditApplicationDialog application={application}>
-            <Button variant="outline">
+            <Button variant="outline" className="w-full sm:w-auto">
               <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -245,7 +247,7 @@ export default function ApplicationDetailPage() {
           </EditApplicationDialog>
           <Button
             variant="outline"
-            className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700"
+            className="w-full sm:w-auto text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800 hover:border-red-300 dark:hover:border-red-700"
             onClick={() => setShowDeleteDialog(true)}
           >
             <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
