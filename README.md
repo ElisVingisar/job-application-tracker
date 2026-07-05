@@ -2,7 +2,7 @@
 
 A full-stack web application for managing and tracking job applications throughout your job search.
 
-**[Live Demo](https://job-application-tracker-seven-iota.vercel.app)**
+**[Live Demo](https://job-application-tracker-seven-iota.vercel.app)** | Currently unavailable (hosting discontinued).
 
 ## Tech Stack
 
